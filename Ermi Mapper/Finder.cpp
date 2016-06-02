@@ -77,10 +77,13 @@ std::vector<Point> Finder::findCorners(string &object, string &scene)
 
 	//-- Show detected matches
 	std::vector<Point> points(4);
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++) {
 		points[i] = Point(scene_corners[i] + Point2f(img_object.cols, 0));
+		points[i].x = points[i].x - img_object.size().width;
+}
 
 	return points;
+
 }
 
 void Finder::findCornersAndDisplay(string &object, string &scene, bool displayMatches)

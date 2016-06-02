@@ -2,10 +2,18 @@
 #include <iostream>
 
 #include "Finder.h"
-
+#include "gdal_priv.h"
+#include "cpl_conv.h"
+using namespace std;
 #include "opencv2/core/core.hpp"
 #include "boost/program_options.hpp"
-
+GDALDataset *poDataset;
+GDALDataset *destDataset;
+GDALDataset *tempDataset;
+GDALRasterBand *rasterBand;
+GDALDriver  *poDriver;
+double t[6];
+int Xp = 1, Yp = 1, L = 0, P = 0;
 std::string object;
 std::string refmap;
 std::string dest;
@@ -18,17 +26,87 @@ int main(int argc, char** argv)
 	if (parseArguments(argc, argv))
 	{
 		//TODO
-		//Dobrze by bylo zebys w tym miejscu sprawdzil czy wszystkie 3 sciezki sa poprawne (czy pliki sa, lub czy ich nie ma)
+
 
 		//wyswietlenie efektow znalezienia
-		//finder.findCornersAndDisplay(object, refmap, true);
+		finder.findCornersAndDisplay(object, refmap, true);
 
+
+
+		//Dobrze by bylo zebys w tym miejscu sprawdzil czy wszystkie 3 sciezki sa poprawne (czy pliki sa, lub czy ich nie ma)
+		GDALAllRegister();
+
+		poDataset = (GDALDataset*)GDALOpen("map_full.tif", GA_ReadOnly);
+		if (poDataset == nullptr)
+		{
+			cout << "Error Dataset\n";
+			return -1;
+		}
+		poDataset->GetGeoTransform(t);
+		cout << "Szerokosc: " << poDataset->GetRasterXSize(); //Rozmiar
+		cout << "\nWysokosc: " << poDataset->GetRasterYSize();
+		cout << "\nLiczba pasm: " << poDataset->GetRasterCount(); //Pasma
+		cout << "\nProjekcja:\n" << poDataset->GetProjectionRef(); //Projekcja
+		cout << "\nParametry transformacji: " << t[0] << ", " << t[1] << ", " << t[2]	//Parametry transformacji afinicznej
+			<< ", " << t[3] << ", " << t[4] << ", " << t[5];
+		//0 i 3 to lewy gorny rog obrazka
+		cout << "\nSterownik: " << poDataset->GetDriver()->GetDescription(); //Sterownik
+		poDriver = poDataset->GetDriver();
+		cout << "\n\n";
+		int xx = 1000000;
+		int yy = 1000000;
 		//pobranie kolejnych punktow wspolrzednych malego obrazka w duzym
 		vector<Point> points = finder.findCorners(object, refmap);
 		for (int i = 0; i < 4; i++)
 		{
-			cout << "Point: " << points[i] << std::endl;
+			//cout << "Point: " << points[i] << std::endl;
+			//cout << points[i].x << " " << points[i].y << endl;
+			if ((points[i].x <= xx) && (points[i].y <= yy)) {
+				xx = points[i].x;
+				yy = points[i].y;
+
+				Xp = t[0] + points[i].x*t[1] + points[i].y*t[2];
+				Yp = t[3] + points[i].x*t[4] + points[i].y*t[5];
+				//wspolrzedne rogów malego obrazka na prawdziwej mapie
+				cout << "x: " << Xp << " y: " << Yp << endl;
+			}
 		}
+
+		
+		//tempDataset = (GDALDataset*)GDALOpen(object.c_str(), GA_ReadOnly);
+		//if (poDataset == nullptr)
+		//{
+		//	cout << "Error Dataset\n";
+		//	return -1;
+		//}
+		tempDataset = (GDALDataset*)GDALOpen(object.c_str(), GA_ReadOnly);
+		if (poDataset == nullptr)
+		{
+			cout << "Error Dataset\n";
+			return -1;
+		}
+		
+		cout << "x: " << Xp << " y: " << Yp << "P: " << xx << " L: " << yy << endl;
+
+		destDataset = poDriver->CreateCopy(dest.c_str(), tempDataset, FALSE, NULL, NULL, NULL);
+		//GDALClose(tempDataset);
+		t[0] = Xp;
+		t[3] = Yp;
+		//t[2] = (Xp - xx*t[1] - t[0]) / yy;
+		//t[4] = (Yp - yy*t[5] - t[3]) / xx;
+		destDataset->SetGeoTransform(t);
+		//destDataset->GetGeoTransform(t);
+		destDataset->SetProjection(poDataset->GetProjectionRef());
+		cout << "Szerokosc: " << destDataset->GetRasterXSize(); //Rozmiar
+		cout << "\nWysokosc: " << destDataset->GetRasterYSize();
+		cout << "\nLiczba pasm: " << destDataset->GetRasterCount(); //Pasma
+		cout << "\nProjekcja:\n" << destDataset->GetProjectionRef(); //Projekcja
+		//GDALSetProjection(poDataset->GetProjectionRef());
+		cout << "\nParametry transformacji: " << t[0] << ", " << t[1] << ", " << t[2]	//Parametry transformacji afinicznej
+			<< ", " << t[3] << ", " << t[4] << ", " << t[5];
+		
+		GDALClose(destDataset);
+		GDALClose(poDataset);		
 
 		//TODO
 		//dodanie referencji do pliczku i zapis wyniku pod sciezka dest
