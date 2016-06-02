@@ -1,0 +1,30 @@
+<PAMDataset>
+  <SRS>PROJCS[&quot;ETRS89 / Poland CS92&quot;,GEOGCS[&quot;ETRS89&quot;,DATUM[&quot;European_Terrestrial_Reference_System_1989&quot;,SPHEROID[&quot;GRS 1980&quot;,6378137,298.257222101,AUTHORITY[&quot;EPSG&quot;,&quot;7019&quot;]],AUTHORITY[&quot;EPSG&quot;,&quot;6258&quot;]],PRIMEM[&quot;Greenwich&quot;,0,AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],UNIT[&quot;degree&quot;,0.01745329251994328,AUTHORITY[&quot;EPSG&quot;,&quot;9122&quot;]],AUTHORITY[&quot;EPSG&quot;,&quot;4258&quot;]],UNIT[&quot;metre&quot;,1,AUTHORITY[&quot;EPSG&quot;,&quot;9001&quot;]],PROJECTION[&quot;Transverse_Mercator&quot;],PARAMETER[&quot;latitude_of_origin&quot;,0],PARAMETER[&quot;central_meridian&quot;,19],PARAMETER[&quot;scale_factor&quot;,0.9993],PARAMETER[&quot;false_easting&quot;,500000],PARAMETER[&quot;false_northing&quot;,-5300000],AUTHORITY[&quot;EPSG&quot;,&quot;2180&quot;],AXIS[&quot;x&quot;,NORTH],AXIS[&quot;y&quot;,EAST]]</SRS>
+  <GeoTransform>  0.0000000000000000e+00,  1.0000000000000000e+00,  0.0000000000000000e+00,  0.0000000000000000e+00,  0.0000000000000000e+00,  1.0000000000000000e+00</GeoTransform>
+  <Metadata domain="IMAGE_STRUCTURE">
+    <MDI key="SOURCE_COLOR_SPACE">YCbCr</MDI>
+    <MDI key="INTERLEAVE">PIXEL</MDI>
+    <MDI key="COMPRESSION">JPEG</MDI>
+  </Metadata>
+  <GCPList>
+    <GCP Id="" Pixel="0.0000" Line="0.0000" X="4.117620000000E+05" Y="6.603180000000E+05" />
+    <GCP Id="" Pixel="601.0000" Line="0.0000" X="4.131280000000E+05" Y="6.603120000000E+05" />
+    <GCP Id="" Pixel="601.0000" Line="475.0000" X="4.131310000000E+05" Y="6.592340000000E+05" />
+    <GCP Id="" Pixel="0.0000" Line="475.0000" X="4.117590000000E+05" Y="6.592340000000E+05" />
+  </GCPList>
+  <PAMRasterBand band="1">
+    <Metadata domain="IMAGE_STRUCTURE">
+      <MDI key="COMPRESSION">JPEG</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="2">
+    <Metadata domain="IMAGE_STRUCTURE">
+      <MDI key="COMPRESSION">JPEG</MDI>
+    </Metadata>
+  </PAMRasterBand>
+  <PAMRasterBand band="3">
+    <Metadata domain="IMAGE_STRUCTURE">
+      <MDI key="COMPRESSION">JPEG</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
