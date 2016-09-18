@@ -15,9 +15,5 @@ class Finder
 {
 public:
 	Finder();
-	vector<Point> findCorners(string &object, string &scene);
-	void findCornersAndDisplay(string &object, string &scene, bool displayMatches);
-
-	vector<Point> test();
-
+	vector<Point> findCorners(string &object, string &scene, bool displayMatches);
 };

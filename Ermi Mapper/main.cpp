@@ -7,19 +7,27 @@
 #include <string>
 #include "gdal_utils.h"
 #include <Windows.h>
-using namespace std;
+
 #include "opencv2/core/core.hpp"
 #include "boost/program_options.hpp"
+
+using namespace std;
+
 GDALDataset *poDataset;
 GDALDataset *destDataset;
 GDALDataset *tempDataset;
 GDALRasterBand *rasterBand;
 GDALDriver  *poDriver;
+
 double t[6];
 int Xp = 1, Yp = 1, L = 0, P = 0;
+
 std::string object;
 std::string refmap;
 std::string dest;
+
+bool displayMatches;
+
 Finder finder;
 
 bool parseArguments(int argc, char** argv);
@@ -28,9 +36,9 @@ int main(int argc, char** argv)
 {
 	if (parseArguments(argc, argv))
 	{
-		
-		//wyswietlenie efektow znalezienia
-		finder.findCornersAndDisplay(object, refmap, true);
+
+		//pobranie kolejnych punktow wspolrzednych malego obrazka w duzym i ewentualne wyswietlenie wynikow
+		vector<Point> points = finder.findCorners(object, refmap, displayMatches);
 
 		//Dobrze by bylo zebys w tym miejscu sprawdzil czy wszystkie 3 sciezki sa poprawne (czy pliki sa, lub czy ich nie ma)
 		GDALAllRegister();
@@ -45,8 +53,6 @@ int main(int argc, char** argv)
 		string argv="gdal_translate -of ";
 		argv += poDataset->GetDriver()->GetDescription();
 		argv.append(" ");
-		//pobranie kolejnych punktow wspolrzednych malego obrazka w duzym
-		vector<Point> points = finder.findCorners(object, refmap);
 		tempDataset = (GDALDataset*)GDALOpen(object.c_str(), GA_ReadOnly);
 		if (poDataset == nullptr)
 		{
@@ -108,12 +114,16 @@ bool parseArguments(int argc, char** argv)
 {
 	namespace po = boost::program_options;
 
+	//TODO
+	//Dodaj opcjonalny argument -s pokazujacy wyniki porownywania i znajdowania map w sobie.
+
 	po::options_description desc("Options");
 	desc.add_options()
 		("help,h", "print help messages")
 		("object,o", po::value<std::string>(), "path to image with no georeferences")
 		("refmap,r", po::value<std::string>(), "path to map with georeferences, should contain object")
 		("dest,d", po::value<std::string>(), "path to result")
+		("show,s", "show matching results")
 		;
 
 	po::variables_map vm;
@@ -145,6 +155,11 @@ bool parseArguments(int argc, char** argv)
 		return 0;
 	}
 
+	if(vm.count("show"))
+		displayMatches = true;
+	else
+		displayMatches = false;
+	
 	if (vm.count("dest"))
 		dest = vm["dest"].as<std::string>();
 	else
